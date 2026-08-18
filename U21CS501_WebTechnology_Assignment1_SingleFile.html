@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>U21CS501 Web Technology — Assignment I</title>
+<style>
+/* =========================================================
+   U21CS501 WEB TECHNOLOGY — ASSIGNMENT I
+   Single-file implementation: HTML5 + CSS3 + JavaScript
+   ========================================================= */
+
+:root{
+  --bg:#f4f7fb;
+  --surface:#ffffff;
+  --surface2:#eef4ff;
+  --text:#172033;
+  --muted:#61708a;
+  --primary:#2563eb;
+  --primary-dark:#1d4ed8;
+  --accent:#7c3aed;
+  --success:#059669;
+  --danger:#dc2626;
+  --warning:#d97706;
+  --border:#d9e2ef;
+  --shadow:0 14px 35px rgba(31,41,55,.10);
+  --radius:18px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  background:linear-gradient(180deg,#edf4ff 0%,var(--bg) 22%,#fff 100%);
+  color:var(--text);
+  line-height:1.6;
+}
+a{color:inherit}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+
+.topbar{
+  position:sticky;top:0;z-index:1000;
+  background:rgba(15,23,42,.94);
+  color:#fff;
+  backdrop-filter:blur(12px);
+  box-shadow:0 5px 22px rgba(0,0,0,.18);
+}
+.nav{
+  max-width:1200px;margin:auto;padding:12px 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.brand{font-weight:800;letter-spacing:.5px}
+.nav-links{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.nav-links a{
+  text-decoration:none;padding:7px 10px;border-radius:9px;
+  color:#dbeafe;font-size:.9rem;
+}
+.nav-links a:hover{background:rgba(255,255,255,.12)}
+
+.container{max-width:1200px;margin:auto;padding:0 20px}
+.hero{
+  padding:76px 20px 50px;
+  background:
+    radial-gradient(circle at 15% 20%,rgba(37,99,235,.25),transparent 30%),
+    radial-gradient(circle at 85% 10%,rgba(124,58,237,.22),transparent 30%);
+}
+.hero-inner{max-width:1200px;margin:auto;display:grid;grid-template-columns:1.2fr .8fr;gap:35px;align-items:center}
+.badge{
+  display:inline-block;padding:6px 11px;border-radius:999px;
+  background:#dbeafe;color:#1d4ed8;font-weight:700;font-size:.82rem;
+}
+.hero h1{font-size:clamp(2.2rem,5vw,4.4rem);line-height:1.05;margin:16px 0}
+.hero p{font-size:1.08rem;color:var(--muted);max-width:700px}
+.hero-card{
+  background:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.9);
+  border-radius:28px;padding:26px;box-shadow:var(--shadow);
+}
+.hero-card .stat{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border)}
+.hero-card .stat:last-child{border:0}
+
+section{padding:65px 0;scroll-margin-top:70px}
+.section-head{margin-bottom:28px}
+.eyebrow{color:var(--primary);font-weight:800;text-transform:uppercase;letter-spacing:1.5px;font-size:.78rem}
+.section-head h2{font-size:2rem;margin:6px 0}
+.section-head p{color:var(--muted);max-width:780px}
+
+.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow);
+}
+.card h3{margin-top:0}
+.muted{color:var(--muted)}
+.pill{display:inline-block;padding:4px 9px;border-radius:999px;background:var(--surface2);color:var(--primary);font-size:.8rem;font-weight:700}
+
+.flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.flow-box{
+  flex:1;min-width:145px;text-align:center;padding:18px 12px;
+  background:#fff;border:2px solid #bfdbfe;border-radius:15px;font-weight:700;
+}
+.arrow{font-size:1.4rem;color:var(--primary);font-weight:900}
+
+.url-demo{
+  background:#0f172a;color:#e2e8f0;border-radius:16px;padding:20px;
+  overflow:auto;font-family:Consolas,monospace;font-size:1rem;
+}
+.url-demo .scheme{color:#60a5fa}
+.url-demo .domain{color:#34d399}
+.url-demo .path{color:#fbbf24}
+.url-demo .query{color:#c084fc}
+.url-demo .fragment{color:#fb7185}
+
+.compare{width:100%;border-collapse:collapse;background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.compare th,.compare td{padding:14px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+.compare th{background:#eaf2ff;color:#1e3a8a}
+
+.diagram{
+  width:100%;min-height:280px;border-radius:18px;
+  background:#f8fbff;border:1px solid var(--border);padding:12px;
+}
+.diagram svg{width:100%;height:260px}
+
+.form-shell{
+  max-width:1050px;margin:auto;background:#fff;border:1px solid var(--border);
+  border-radius:24px;box-shadow:var(--shadow);overflow:hidden;
+}
+.form-header{padding:26px;background:linear-gradient(135deg,#1d4ed8,#7c3aed);color:#fff}
+.form-header h3{margin:0;font-size:1.6rem}
+.form-body{padding:28px}
+.form-section{padding:20px;margin-bottom:20px;border:1px solid var(--border);border-radius:16px;background:#fbfdff}
+.form-section h4{margin-top:0}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+.field label{font-weight:700;font-size:.9rem}
+.field input,.field select,.field textarea{
+  width:100%;padding:11px 13px;border:1px solid #cbd5e1;border-radius:10px;
+  background:#fff;outline:none;transition:.2s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.12)
+}
+.choice-row{display:flex;gap:20px;flex-wrap:wrap}
+.choice-row label{font-weight:500}
+.media-demo{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.media-box{padding:15px;border:1px dashed #93c5fd;border-radius:14px;background:#f8fbff}
+.media-box img{width:100%;height:150px;object-fit:cover;border-radius:10px}
+.media-box video{width:100%;height:150px;border-radius:10px;background:#0f172a}
+.media-box audio{width:100%}
+.actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn{
+  border:0;border-radius:11px;padding:11px 18px;font-weight:800;
+  transition:transform .18s,box-shadow .18s,background .18s;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-secondary{background:#e2e8f0;color:#0f172a}
+.success-box,.error-box{
+  margin-top:15px;padding:13px 15px;border-radius:11px;display:none;font-weight:700
+}
+.success-box{background:#d1fae5;color:#065f46}
+.error-box{background:#fee2e2;color:#991b1b}
+
+.fashion{
+  background:
+    linear-gradient(120deg,rgba(17,24,39,.92),rgba(30,41,59,.78)),
+    radial-gradient(circle at 80% 20%,#7c3aed,transparent 40%);
+  color:#fff;border-radius:30px;overflow:hidden;box-shadow:var(--shadow)
+}
+.fashion-hero{padding:65px 45px;position:relative}
+.fashion-hero h2{font-size:clamp(2.3rem,5vw,4.7rem);line-height:1;margin:0 0 18px;
+  text-shadow:3px 3px 0 rgba(124,58,237,.35)}
+.fashion-hero p{color:#dbeafe;max-width:600px}
+.fashion-cta{display:inline-block;margin-top:12px;padding:12px 18px;border-radius:12px;
+  background:#fff;color:#111827;text-decoration:none;font-weight:900}
+.animated-dot{
+  position:absolute;width:90px;height:90px;border-radius:50%;right:8%;top:18%;
+  border:2px solid rgba(255,255,255,.35);animation:float 3s ease-in-out infinite
+}
+.animated-dot::after{content:"";position:absolute;inset:18px;border-radius:50%;background:#a78bfa;filter:blur(1px)}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-18px) rotate(12deg)}}
+.product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;padding:0 30px 35px}
+.product{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
+  border-radius:16px;padding:18px;transition:.25s}
+.product:hover{transform:translateY(-7px);background:rgba(255,255,255,.13)}
+.product-icon{height:120px;border-radius:13px;display:grid;place-items:center;font-size:3.2rem;
+  background:linear-gradient(135deg,#f1f5f9,#cbd5e1);color:#111827;margin-bottom:12px}
+.price{font-weight:900;color:#c4b5fd}
+
+.calculator-shell{max-width:850px;margin:auto}
+.input-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.result-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
+.result-card{background:#fff;border:1px solid var(--border);border-radius:15px;padding:18px;text-align:center;box-shadow:var(--shadow)}
+.result-card strong{display:block;font-size:1.5rem;margin-top:5px}
+.status-pass{color:var(--success)}
+.status-fail{color:var(--danger)}
+
+.bill-table{width:100%;border-collapse:collapse}
+.bill-table th,.bill-table td{padding:11px;border-bottom:1px solid var(--border);text-align:left}
+.bill-table input{width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:8px}
+.bill-summary{max-width:420px;margin:22px 0 0 auto;background:#f8fbff;border:1px solid var(--border);border-radius:16px;padding:18px}
+.summary-row{display:flex;justify-content:space-between;padding:8px 0}
+.summary-row.final{font-size:1.25rem;font-weight:900;border-top:2px solid #cbd5e1;margin-top:8px;padding-top:14px}
+.discount{color:var(--success);font-weight:800}
+
+footer{background:#0f172a;color:#cbd5e1;padding:35px 20px;margin-top:30px}
+.footer-inner{max-width:1200px;margin:auto;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr}
+  .card-grid{grid-template-columns:1fr 1fr}
+  .product-grid{grid-template-columns:1fr 1fr}
+  .result-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:650px){
+  .nav{align-items:flex-start;flex-direction:column}
+  .nav-links{justify-content:flex-start}
+  .card-grid,.form-grid,.media-demo,.product-grid,.result-grid{grid-template-columns:1fr}
+  .input-grid{grid-template-columns:1fr 1fr}
+  .fashion-hero{padding:45px 25px}
+  .product-grid{padding:0 20px 25px}
+  .form-body{padding:18px}
+}
+@media(max-width:430px){
+  .input-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+<header class="topbar">
+  <nav class="nav" aria-label="Assignment navigation">
+    <div class="brand">U21CS501 • Web Technology</div>
+    <div class="nav-links">
+      <a href="#q1">Q1</a><a href="#q2">Q2</a><a href="#q3">Q3</a><a href="#q4">Q4</a><a href="#q5">Q5</a>
+    </div>
+  </nav>
+</header>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div>
+      <span class="badge">ASSIGNMENT I • 2026–2027</span>
+      <h1>Web Technology<br>Interactive Portfolio</h1>
+      <p>
+        Prepared by <b>24CS223 • Suriyan K S • III CSE D</b><br>A single self-contained HTML5 file demonstrating the five tasks in
+        U21CS501 Web Technology using HTML5, CSS3 and JavaScript.
+      </p>
+    </div>
+    <div class="hero-card">
+      <div class="stat"><span>Institution</span><strong>KPRIET</strong></div>
+      <div class="stat"><span>Department</span><strong>CSE</strong></div>
+      <div class="stat"><span>Year / Section</span><strong>III CSE D</strong></div>
+      <div class="stat"><span>Maximum Marks</span><strong>40</strong></div><div class="stat"><span>Student</span><strong>24CS223 • Suriyan K S</strong></div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+<!-- =====================================================
+     QUESTION 1 — INTERNET / WEB FUNDAMENTALS
+     ===================================================== -->
+<section id="q1">
+  <div class="section-head">
+    <div class="eyebrow">Question 01 • CO1</div>
+    <h2>World Wide Web Fundamentals</h2>
+    <p>Illustrated overview of the Internet, networks, URLs, domains, browsers, servers and website operation.</p>
+  </div>
+
+  <div class="card-grid">
+    <article class="card">
+      <span class="pill">Internet Overview</span>
+      <h3>What is the Internet?</h3>
+      <p>The Internet is a global network of interconnected computer networks that communicate using standard protocols such as TCP/IP.</p>
+      <p class="muted"><b>Example:</b> Your browser, Wi-Fi router, ISP and a web server work together to deliver a webpage.</p>
+    </article>
+    <article class="card">
+      <span class="pill">Network Concepts</span>
+      <h3>How devices communicate</h3>
+      <p>Devices use addresses and protocols to exchange data. IP identifies hosts at the network layer, while ports identify application services.</p>
+      <p class="muted"><b>Key terms:</b> IP address, MAC address, router, switch, DNS, TCP/UDP and HTTP/HTTPS.</p>
+    </article>
+    <article class="card">
+      <span class="pill">Domain Name</span>
+      <h3>Human-friendly identity</h3>
+      <p>A domain name provides a memorable name for a network service. DNS translates names into IP addresses so clients can locate servers.</p>
+      <p class="muted"><b>Example:</b> <code>example.com</code></p>
+    </article>
+  </div>
+
+  <div class="diagram" style="margin-top:20px">
+    <svg viewBox="0 0 1000 260" role="img" aria-label="Internet communication diagram">
+      <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/>
+        </marker>
+      </defs>
+      <rect x="30" y="80" width="160" height="85" rx="18" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+      <text x="110" y="116" text-anchor="middle" font-weight="700" fill="#172033">Client Device</text>
+      <text x="110" y="140" text-anchor="middle" fill="#61708a">Browser</text>
+      <rect x="270" y="80" width="160" height="85" rx="18" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+      <text x="350" y="116" text-anchor="middle" font-weight="700" fill="#172033">Router / ISP</text>
+      <text x="350" y="140" text-anchor="middle" fill="#61708a">Network Path</text>
+      <rect x="510" y="80" width="160" height="85" rx="18" fill="#dcfce7" stroke="#059669" stroke-width="2"/>
+      <text x="590" y="116" text-anchor="middle" font-weight="700" fill="#172033">DNS</text>
+      <text x="590" y="140" text-anchor="middle" fill="#61708a">Name → IP</text>
+      <rect x="750" y="80" width="190" height="85" rx="18" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+      <text x="845" y="116" text-anchor="middle" font-weight="700" fill="#172033">Web Server</text>
+      <text x="845" y="140" text-anchor="middle" fill="#61708a">HTML / CSS / JS</text>
+      <line x1="190" y1="122" x2="270" y2="122" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
+      <line x1="430" y1="122" x2="510" y2="122" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
+      <line x1="670" y1="122" x2="750" y2="122" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
+      <text x="500" y="215" text-anchor="middle" fill="#61708a">Request travels through networks → server processes it → response returns to the browser</text>
+    </svg>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <span class="pill">URL Structure</span>
+    <h3>Breaking down a URL</h3>
+    <div class="url-demo">
+      <span class="scheme">https://</span><span class="domain">www.example.com</span><span class="path">/courses/web</span><span class="query">?id=501</span><span class="fragment">#overview</span>
+    </div>
+    <p><b>Scheme:</b> protocol used • <b>Domain:</b> host name • <b>Path:</b> requested resource • <b>Query:</b> parameters • <b>Fragment:</b> location within a document.</p>
+  </div>
+
+  <div class="card-grid" style="margin-top:20px">
+    <article class="card">
+      <h3>Web Browser</h3>
+      <p>Client software such as a browser sends HTTP/HTTPS requests and interprets returned HTML, CSS and JavaScript to render a webpage.</p>
+    </article>
+    <article class="card">
+      <h3>Web Server</h3>
+      <p>A web server receives requests, locates or generates resources, and sends responses to clients. Server-side applications may also access databases.</p>
+    </article>
+    <article class="card">
+      <h3>Working Principle</h3>
+      <p>Enter URL → DNS resolution → connection → HTTP request → server processing → HTTP response → browser parses and renders the page.</p>
+    </article>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <h3>Client-side vs Server-side Scripting</h3>
+    <table class="compare">
+      <thead><tr><th>Client-side</th><th>Server-side</th></tr></thead>
+      <tbody>
+        <tr><td>Runs mainly in the user's browser.</td><td>Runs on the web server.</td></tr>
+        <tr><td>JavaScript is the primary browser scripting language.</td><td>Can use technologies such as Node.js, Java, Python, PHP, etc.</td></tr>
+        <tr><td>Used for UI interaction and dynamic page behaviour.</td><td>Used for business logic, authentication, database access and APIs.</td></tr>
+        <tr><td>Source code is generally delivered to the client.</td><td>Implementation remains on the server; client receives the response.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- =====================================================
+     QUESTION 2 — STUDENT ADMISSION FORM
+     ===================================================== -->
+<section id="q2">
+  <div class="section-head">
+    <div class="eyebrow">Question 02 • CO2</div>
+    <h2>Student Admission Portal</h2>
+    <p>Responsive HTML5 form demonstrating multiple form elements, input types, media elements, CSS selectors and the box model.</p>
+  </div>
+
+  <div class="form-shell">
+    <div class="form-header">
+      <h3>Undergraduate Admission Application</h3>
+      <p>Academic Year 2026–2027 • KPR Institute of Engineering and Technology</p>
+    </div>
+    <div class="form-body">
+      <form id="admissionForm">
+        <div class="form-section">
+          <h4>1. Personal Information</h4>
+          <div class="form-grid">
+            <div class="field">
+              <label for="fullName">Full Name *</label>
+              <input id="fullName" name="fullName" type="text" placeholder="Enter your name" required>
+            </div>
+            <div class="field">
+              <label for="email">Email *</label>
+              <input id="email" name="email" type="email" placeholder="student@example.com" required>
+            </div>
+            <div class="field">
+              <label for="phone">Mobile Number *</label>
+              <input id="phone" name="phone" type="tel" placeholder="+91 XXXXX XXXXX" pattern="[0-9+\-\s]{10,15}" required>
+            </div>
+            <div class="field">
+              <label for="dob">Date of Birth *</label>
+              <input id="dob" name="dob" type="date" required>
+            </div>
+            <div class="field">
+              <label>Gender</label>
+              <div class="choice-row">
+                <label><input type="radio" name="gender" value="Male"> Male</label>
+                <label><input type="radio" name="gender" value="Female"> Female</label>
+                <label><input type="radio" name="gender" value="Other"> Other</label>
+              </div>
+            </div>
+            <div class="field">
+              <label for="photo">Passport Photo</label>
+              <input id="photo" name="photo" type="file" accept="image/*">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h4>2. Academic Information</h4>
+          <div class="form-grid">
+            <div class="field">
+              <label for="course">Preferred Course *</label>
+              <select id="course" required>
+                <option value="">Select a course</option>
+                <option>Computer Science and Engineering</option>
+                <option>Information Technology</option>
+                <option>Electronics and Communication Engineering</option>
+                <option>Mechanical Engineering</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="percentage">Qualifying Percentage</label>
+              <input id="percentage" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+            </div>
+            <div class="field full">
+              <label for="address">Address</label>
+              <textarea id="address" rows="3" placeholder="Enter your communication address"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h4>3. Media Elements</h4>
+          <div class="media-demo">
+            <div class="media-box">
+              <strong>College Preview Image</strong>
+              <!-- Inline SVG is used as an image so the whole project remains self-contained. -->
+              <img alt="Illustrated college campus" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 300'%3E%3Crect width='600' height='300' fill='%23dbeafe'/%3E%3Crect y='210' width='600' height='90' fill='%2386efac'/%3E%3Crect x='145' y='85' width='310' height='135' rx='8' fill='%23ffffff' stroke='%232563eb' stroke-width='5'/%3E%3Cpolygon points='120,90 480,90 300,25' fill='%231d4ed8'/%3E%3Cg fill='%2393c5fd'%3E%3Crect x='175' y='115' width='48' height='55'/%3E%3Crect x='240' y='115' width='48' height='55'/%3E%3Crect x='312' y='115' width='48' height='55'/%3E%3Crect x='377' y='115' width='48' height='55'/%3E%3C/g%3E%3Ctext x='300' y='202' text-anchor='middle' font-family='Arial' font-size='24' font-weight='700' fill='%231e3a8a'%3EKPRIET%3C/text%3E%3C/svg%3E">
+            </div>
+            <div class="media-box">
+              <strong>Campus Orientation Video</strong>
+              <!-- JavaScript creates a tiny generated video at runtime to avoid external files. -->
+              <video id="orientationVideo" controls muted playsinline poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300'%3E%3Crect width='600' height='300' fill='%230f172a'/%3E%3Ctext x='300' y='145' text-anchor='middle' fill='white' font-size='28' font-family='Arial'%3ECampus Orientation%3C/text%3E%3Ctext x='300' y='180' text-anchor='middle' fill='%2393c5fd' font-size='18' font-family='Arial'%3ESelf-contained demo video%3C/text%3E%3C/svg%3E"></video>
+            </div>
+            <div class="media-box" style="grid-column:1/-1">
+              <strong>Admission Information Audio</strong>
+              <audio id="infoAudio" controls></audio>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">Submit Application</button>
+          <button class="btn btn-secondary" type="reset">Reset Form</button>
+        </div>
+        <div id="formSuccess" class="success-box" role="status">Application validated successfully. This demonstration does not send data to a server.</div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================
+     QUESTION 3 — FASHION HOMEPAGE
+     ===================================================== -->
+<section id="q3">
+  <div class="section-head">
+    <div class="eyebrow">Question 03 • CO2 / CO3</div>
+    <h2>Fashion Store Homepage</h2>
+    <p>Modern landing page demonstrating backgrounds, borders, text effects, CSS animation, multiple-column layout and UI design principles.</p>
+  </div>
+
+  <div class="fashion">
+    <div class="fashion-hero">
+      <div class="animated-dot" aria-hidden="true"></div>
+      <span class="pill">NEW SEASON • 2026</span>
+      <h2>DEFINE<br>YOUR STYLE.</h2>
+      <p>Minimal silhouettes, bold textures and everyday essentials designed for a modern wardrobe.</p>
+      <a class="fashion-cta" href="#products">Explore Collection →</a>
+    </div>
+    <div id="products" class="product-grid">
+      <article class="product">
+        <div class="product-icon">👕</div>
+        <h3>Urban Tee</h3><p>Premium cotton</p><div class="price">₹899</div>
+      </article>
+      <article class="product">
+        <div class="product-icon">👟</div>
+        <h3>Street Runner</h3><p>Daily sneakers</p><div class="price">₹2,499</div>
+      </article>
+      <article class="product">
+        <div class="product-icon">🧥</div>
+        <h3>Layer Jacket</h3><p>Lightweight outerwear</p><div class="price">₹3,199</div>
+      </article>
+      <article class="product">
+        <div class="product-icon">👜</div>
+        <h3>City Tote</h3><p>Everyday carry</p><div class="price">₹1,499</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================
+     QUESTION 4 — GRADE CALCULATOR
+     ===================================================== -->
+<section id="q4">
+  <div class="section-head">
+    <div class="eyebrow">Question 04 • CO3</div>
+    <h2>Student Grade Calculator</h2>
+    <p>Accepts marks for five subjects and displays total, average, grade and pass/fail status.</p>
+  </div>
+
+  <div class="card calculator-shell">
+    <div class="input-grid">
+      <div class="field"><label for="m1">Subject 1</label><input class="mark" id="m1" type="number" min="0" max="100" value="85"></div>
+      <div class="field"><label for="m2">Subject 2</label><input class="mark" id="m2" type="number" min="0" max="100" value="78"></div>
+      <div class="field"><label for="m3">Subject 3</label><input class="mark" id="m3" type="number" min="0" max="100" value="92"></div>
+      <div class="field"><label for="m4">Subject 4</label><input class="mark" id="m4" type="number" min="0" max="100" value="81"></div>
+      <div class="field"><label for="m5">Subject 5</label><input class="mark" id="m5" type="number" min="0" max="100" value="88"></div>
+    </div>
+    <div style="margin-top:18px" class="actions">
+      <button class="btn btn-primary" onclick="calculateGrade()">Calculate Result</button>
+      <button class="btn btn-secondary" onclick="clearGrade()">Clear</button>
+    </div>
+    <div id="gradeError" class="error-box"></div>
+    <div class="result-grid">
+      <div class="result-card"><span>Total</span><strong id="totalResult">424 / 500</strong></div>
+      <div class="result-card"><span>Average</span><strong id="avgResult">84.8%</strong></div>
+      <div class="result-card"><span>Grade</span><strong id="gradeResult">A</strong></div>
+      <div class="result-card"><span>Status</span><strong id="statusResult" class="status-pass">PASS</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================
+     QUESTION 5 — SUPERMARKET BILLING
+     ===================================================== -->
+<section id="q5">
+  <div class="section-head">
+    <div class="eyebrow">Question 05 • CO3</div>
+    <h2>Supermarket Billing System</h2>
+    <p>Calculates the bill for three products and applies a 10% discount when the total exceeds ₹2000.</p>
+  </div>
+
+  <div class="card">
+    <div style="overflow-x:auto">
+      <table class="bill-table">
+        <thead>
+          <tr><th>Product</th><th>Quantity</th><th>Unit Price (₹)</th><th>Item Total (₹)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input id="p1name" type="text" value="Wireless Mouse"></td>
+            <td><input id="p1qty" class="bill-input" type="number" min="0" value="2"></td>
+            <td><input id="p1price" class="bill-input" type="number" min="0" value="650"></td>
+            <td id="p1total">₹1,300.00</td>
+          </tr>
+          <tr>
+            <td><input id="p2name" type="text" value="Keyboard"></td>
+            <td><input id="p2qty" class="bill-input" type="number" min="0" value="1"></td>
+            <td><input id="p2price" class="bill-input" type="number" min="0" value="950"></td>
+            <td id="p2total">₹950.00</td>
+          </tr>
+          <tr>
+            <td><input id="p3name" type="text" value="USB Hub"></td>
+            <td><input id="p3qty" class="bill-input" type="number" min="0" value="1"></td>
+            <td><input id="p3price" class="bill-input" type="number" min="0" value="350"></td>
+            <td id="p3total">₹350.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="actions" style="margin-top:20px">
+      <button class="btn btn-primary" onclick="calculateBill()">Generate Bill</button>
+      <button class="btn btn-secondary" onclick="resetBill()">Reset</button>
+    </div>
+    <div class="bill-summary">
+      <div class="summary-row"><span>Subtotal</span><strong id="billSubtotal">₹2,600.00</strong></div>
+      <div class="summary-row"><span>Discount</span><strong id="billDiscount" class="discount">− ₹260.00</strong></div>
+      <div class="summary-row final"><span>Final Payable</span><strong id="billFinal">₹2,340.00</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================
+     CONCLUSION
+     ===================================================== -->
+<section>
+  <div class="card">
+    <div class="eyebrow">Conclusion</div>
+    <h2>Assignment Summary</h2>
+    <p>
+      This single-page implementation demonstrates core HTML5, CSS3 and JavaScript concepts
+      through five practical scenarios. It covers web fundamentals, responsive forms, UI design,
+      CSS effects, JavaScript decision-making, iteration, functions and arithmetic processing.
+      The examples are interactive and structured to make the required concepts directly visible.
+    </p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div><strong>U21CS501 Web Technology</strong><br>KPR Institute of Engineering and Technology<br>24CS223 • Suriyan K S • III CSE D</div>
+    <div>Assignment I • Maximum Marks: 40<br>Single-file HTML5 + CSS3 + JavaScript</div>
+  </div>
+</footer>
+
+<script>
+/* =========================================================
+   QUESTION 2 — FORM VALIDATION
+   ========================================================= */
+document.getElementById("admissionForm").addEventListener("submit", function(event){
+  event.preventDefault();
+  if(this.checkValidity()){
+    const box = document.getElementById("formSuccess");
+    box.style.display = "block";
+    box.textContent = "Application validated successfully. This demonstration does not send data to a server.";
+  }else{
+    this.reportValidity();
+  }
+});
+
+/* =========================================================
+   QUESTION 2 — SELF-CONTAINED AUDIO
+   The source is inserted by JavaScript as a data URL.
+   ========================================================= */
+document.getElementById("infoAudio").src =
+  "data:audio/wav;base64,UklGRqQ+AABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YYA+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+
+/* =========================================================
+   QUESTION 2 — GENERATED VIDEO
+   A small canvas recording is created locally. This keeps
+   the assignment in a single HTML file with no external
+   video dependency.
+   ========================================================= */
+(function createDemoVideo(){
+  const video = document.getElementById("orientationVideo");
+  if(!window.MediaRecorder) return;
+  try{
+    const canvas = document.createElement("canvas");
+    canvas.width = 640; canvas.height = 360;
+    const ctx = canvas.getContext("2d");
+    const stream = canvas.captureStream(10);
+    const recorder = new MediaRecorder(stream, {mimeType:"video/webm"});
+    const chunks = [];
+    recorder.ondataavailable = e => { if(e.data.size) chunks.push(e.data); };
+    recorder.onstop = () => {
+      video.src = URL.createObjectURL(new Blob(chunks,{type:"video/webm"}));
+    };
+    recorder.start();
+    let frame = 0;
+    const timer = setInterval(() => {
+      frame++;
+      const g = ctx.createLinearGradient(0,0,640,360);
+      g.addColorStop(0,"#0f172a"); g.addColorStop(1,"#312e81");
+      ctx.fillStyle=g; ctx.fillRect(0,0,640,360);
+      ctx.fillStyle="#ffffff"; ctx.textAlign="center";
+      ctx.font="bold 34px Arial"; ctx.fillText("KPRIET Campus Orientation",320,150);
+      ctx.font="20px Arial"; ctx.fillStyle="#93c5fd";
+      ctx.fillText("Web Technology • Self-contained media demo",320,195);
+      ctx.fillStyle="#c4b5fd"; ctx.fillRect(230,245,180,6);
+      ctx.fillStyle="#ffffff"; ctx.font="16px Arial";
+      ctx.fillText("Frame " + frame,320,290);
+      if(frame >= 30){
+        clearInterval(timer); recorder.stop(); stream.getTracks().forEach(t=>t.stop());
+      }
+    },100);
+  }catch(e){
+    /* Browser may block MediaRecorder MIME type; the poster remains visible. */
+  }
+})();
+
+/* =========================================================
+   QUESTION 4 — GRADE CALCULATOR
+   Demonstrates variables, data types, literals, operators,
+   selection, iteration and user-defined functions.
+   ========================================================= */
+function getMarks(){
+  const inputs = document.querySelectorAll(".mark");
+  const marks = []; // Array is used to store five subject marks.
+  for(const input of inputs){ // Iteration statement.
+    const value = Number(input.value); // Number data type conversion.
+    if(!Number.isFinite(value) || value < 0 || value > 100){
+      throw new Error("Each mark must be a number from 0 to 100.");
+    }
+    marks.push(value);
+  }
+  return marks;
+}
+
+function calculateTotal(marks){
+  let total = 0; // Variable with numeric literal.
+  for(const mark of marks){ // Iteration statement.
+    total += mark; // Arithmetic operator.
+  }
+  return total;
+}
+
+function calculateAverage(total, count){
+  return total / count; // Arithmetic operator.
+}
+
+function determineGrade(average){
+  // Selection statement: grade depends on the average.
+  if(average >= 90) return "A+";
+  if(average >= 80) return "A";
+  if(average >= 70) return "B";
+  if(average >= 60) return "C";
+  if(average >= 50) return "D";
+  return "F";
+}
+
+function calculateGrade(){
+  const error = document.getElementById("gradeError");
+  error.style.display = "none";
+  try{
+    const marks = getMarks();
+    const total = calculateTotal(marks);
+    const average = calculateAverage(total, marks.length);
+    const grade = determineGrade(average);
+    const passed = marks.every(mark => mark >= 40) && average >= 40;
+
+    document.getElementById("totalResult").textContent = total + " / 500";
+    document.getElementById("avgResult").textContent = average.toFixed(2) + "%";
+    document.getElementById("gradeResult").textContent = grade;
+
+    const status = document.getElementById("statusResult");
+    status.textContent = passed ? "PASS" : "FAIL";
+    status.className = passed ? "status-pass" : "status-fail";
+  }catch(err){
+    error.textContent = err.message;
+    error.style.display = "block";
+  }
+}
+
+function clearGrade(){
+  document.querySelectorAll(".mark").forEach(input => input.value = "");
+  document.getElementById("totalResult").textContent = "—";
+  document.getElementById("avgResult").textContent = "—";
+  document.getElementById("gradeResult").textContent = "—";
+  const status = document.getElementById("statusResult");
+  status.textContent = "—"; status.className = "";
+  document.getElementById("gradeError").style.display = "none";
+}
+
+/* =========================================================
+   QUESTION 5 — SUPERMARKET BILLING
+   Demonstrates variables, literals, operators, statements
+   and user-defined functions.
+   ========================================================= */
+function getNumber(id){
+  const value = Number(document.getElementById(id).value);
+  return Number.isFinite(value) && value >= 0 ? value : 0;
+}
+
+function calculateItemTotal(quantity, unitPrice){
+  return quantity * unitPrice;
+}
+
+function calculateDiscount(subtotal){
+  // Selection statement required by the question.
+  return subtotal > 2000 ? subtotal * 0.10 : 0;
+}
+
+function formatCurrency(value){
+  return "₹" + value.toLocaleString("en-IN", {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function calculateBill(){
+  const q1 = getNumber("p1qty"), p1 = getNumber("p1price");
+  const q2 = getNumber("p2qty"), p2 = getNumber("p2price");
+  const q3 = getNumber("p3qty"), p3 = getNumber("p3price");
+
+  const t1 = calculateItemTotal(q1,p1);
+  const t2 = calculateItemTotal(q2,p2);
+  const t3 = calculateItemTotal(q3,p3);
+  const subtotal = t1 + t2 + t3;
+  const discount = calculateDiscount(subtotal);
+  const finalAmount = subtotal - discount;
+
+  document.getElementById("p1total").textContent = formatCurrency(t1);
+  document.getElementById("p2total").textContent = formatCurrency(t2);
+  document.getElementById("p3total").textContent = formatCurrency(t3);
+  document.getElementById("billSubtotal").textContent = formatCurrency(subtotal);
+  document.getElementById("billDiscount").textContent = discount > 0 ? "− " + formatCurrency(discount) : "₹0.00";
+  document.getElementById("billFinal").textContent = formatCurrency(finalAmount);
+}
+
+function resetBill(){
+  document.getElementById("p1qty").value=2; document.getElementById("p1price").value=650;
+  document.getElementById("p2qty").value=1; document.getElementById("p2price").value=950;
+  document.getElementById("p3qty").value=1; document.getElementById("p3price").value=350;
+  calculateBill();
+}
+
+/* Calculate default outputs on first load. */
+calculateGrade();
+calculateBill();
+</script>
+</body>
+</html>
